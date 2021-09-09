@@ -30,4 +30,12 @@ export default class FirebaseService extends Service {
       console.error("Error adding document: ", e);
     }
   }
+
+  async joinRoom(id) {
+    try {
+
+    } catch (e) {
+      console.error("Error joining the room: ", e);
+    }
+  }
 }
