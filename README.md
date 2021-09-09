@@ -17,7 +17,6 @@ You will need the following things properly installed on your computer.
 * `git clone <repository-url>` this repository
 * `cd esteamay`
 * `npm install`
-* `npm install firebase`
 
 ## Running / Development
 
