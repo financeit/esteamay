@@ -4,14 +4,17 @@ import { inject as service } from '@ember/service'
 
 export default class IndexController extends Controller {
   @service router
+  @service firebase
 
   formData = {}
 
   @action
-  createNewRoom() {
-    let randomAlphanumericId = Math.random().toString(36).substr(2, 6)
+  async createNewRoom() {
+    let id = Math.random().toString(36).substr(2, 6) // alphanumeric id
 
-    this.router.transitionTo('room', randomAlphanumericId)
+    await this.firebase.createRoom(id)
+
+    this.router.transitionTo('room', id)
     // set up a new firebase room here
   }
 
