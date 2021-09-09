@@ -14,3 +14,9 @@
     </button>
   {{/each}}
 </div>
+
+<div class="tw-mt-6">
+  <UiButton @kind="secondary" @text="Reset cards" @underlineOnHover={{false}} @onClick={{action "reset"}} />
+  <UiButton @kind="primary" @text="Reveal" @underlineOnHover={{false}} @onClick={{action "reveal"}} />
+</div>
+

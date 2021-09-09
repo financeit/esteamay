@@ -1,6 +1,6 @@
 import Service from '@ember/service'
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, addDoc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, addDoc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAMhrnEu1SbhoHZ8on5SWI79En8eb6U-KU',
@@ -15,13 +15,28 @@ export default class FirebaseService extends Service {
   app = initializeApp(firebaseConfig);
   db = getFirestore(this.app)
 
+  async setScoreDoc(roomId) {
+    const collectionRef = collection(this.db, 'rooms', roomId, 'scores')
+    const scoreDoc = await addDoc(collectionRef, {})
+
+    this.scoreId = scoreDoc.id
+
+    return scoreDoc
+  }
+
+  async reveal(id) {
+    // add code to sum up all of the scores in the firebase room
+  }
+
+  async reset(id) {
+    // add code to delete all of the scores in the firebase room
+  }
+
   async createRoom(id) {
     try {
       await setDoc(doc(this.db, 'rooms', id), { id })
-      const collectionRef = collection(this.db, 'rooms', id, 'scores')
-      const scoreDoc = await addDoc(collectionRef, { })
 
-      this.scoreId = scoreDoc.id
+      let scoreDoc = this.setScoreDoc(id)
 
       console.log("Document written with ID: ", scoreDoc.id);
     } catch (e) {
@@ -36,10 +51,8 @@ export default class FirebaseService extends Service {
 
       if (docSnap.exists()) {
         console.log("Document data:", docSnap.data());
-        const collectionRef = collection(this.db, 'rooms', id, 'scores')
-        const scoreDoc = await addDoc(collectionRef, { })
 
-        this.scoreId = scoreDoc.id
+        this.setScoreDoc(id)
         return true
       } else {
         // doc.data() will be undefined in this case
@@ -53,16 +66,15 @@ export default class FirebaseService extends Service {
 
   async vote(id, score) {
     try {
-      const roomRef = doc(this.db, 'rooms', id);
-      const room = await getDoc(roomRef);
+      const roomRef = doc(this.db, 'rooms', id)
+      const room = await getDoc(roomRef)
 
-      // Check room availability
-      //if (room.exists()) {
+      if (room.exists()) {
         const scoreRef = doc(this.db, 'rooms', id, 'scores', this.scoreId)
         await setDoc(scoreRef, { score })
-      //} else {
-      //  console.log("No such room!");
-      //}
+      } else {
+       console.log("No such room!");
+      }
     } catch (e) {
       console.error("Error voting the room: ", e);
     }
