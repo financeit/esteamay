@@ -3,7 +3,6 @@ import { action } from '@ember/object'
 import { tracked } from '@glimmer/tracking'
 import { inject as service } from '@ember/service'
 
-
 export default class RoomController extends Controller {
   @service firebase
 
@@ -16,5 +15,15 @@ export default class RoomController extends Controller {
     this.selectedNumber = number
 
     await this.firebase.vote(this.model.roomId, number)
+  }
+
+  @action
+  async reset() {
+    await this.firebase.reset(this.model.roomId)
+  }
+
+  @action
+  async reveal() {
+    await this.firebase.reveal(this.model.roomId)
   }
 }
