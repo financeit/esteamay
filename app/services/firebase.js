@@ -24,10 +24,6 @@ export default class FirebaseService extends Service {
     return scoreDoc
   }
 
-  async reveal(id) {
-    // add code to sum up all of the scores in the firebase room
-  }
-
   async reset(id) {
     // add code to delete all of the scores in the firebase room
   }
@@ -68,9 +64,15 @@ export default class FirebaseService extends Service {
     try {
       const roomRef = doc(this.db, 'rooms', id)
       const room = await getDoc(roomRef)
+      console.log('Voting in the room')
+      console.log(room)
 
       if (room.exists()) {
         const scoreRef = doc(this.db, 'rooms', id, 'scores', this.scoreId)
+        console.log('Found score')
+        console.log(scoreRef)
+        console.log('Score ' + score)
+
         await setDoc(scoreRef, { score })
       } else {
        console.log("No such room!");
@@ -82,22 +84,25 @@ export default class FirebaseService extends Service {
 
   async reveal(id) {
     try {
-      const roomRef = doc(this.db, 'rooms', id);
-      const docSnap = await getDoc(roomRef);
+      console.log(id)
+      const roomRef = doc(this.db, 'rooms', id)
+      const docSnap = await getDoc(roomRef)
 
       if (docSnap.exists()) {
-        const scoresRef = doc(this.db, 'rooms', id, 'scores')
-        const scoresSnap = await getDoc(scoresRef);
+        const collectionRef = collection(this.db, 'rooms', id, 'scores')
 
-        console.log(scoresSnap.data())
+        console.log(collectionRef)
+        //const scoresSnap = await getDoc(scoresRef);
+
+        //console.log(scoresSnap.data())
 
         return true
       } else {
         // doc.data() will be undefined in this case
-        console.log("No such document!");
+        console.log("No such document!")
       }
     } catch (e) {
-      console.error("Error joining the room: ", e);
+      console.error("Error joining the room: ", e)
     }
     return false
   }
