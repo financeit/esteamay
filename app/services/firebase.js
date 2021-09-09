@@ -12,12 +12,8 @@ const firebaseConfig = {
 }
 
 export default class FirebaseService extends Service {
-  constructor() {
-    super(...arguments)
-
-    const app = initializeApp(firebaseConfig);
-    this.db = getFirestore(app)
-  }
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(this.app)
 
   async createRoom(id) {
     try {
