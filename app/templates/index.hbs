@@ -1,1 +1,10 @@
 <UiHeading @level={{2}} @text="I'm the index page" />
+
+<UiButton @kind="secondary" @text="Create new room" @underlineOnHover={{false}} @onClick={{action "createNewRoom"}} />
+
+{{#ui-form object=this.formData onSubmit=(action "joinRoom") as |f|}}
+  {{#ui-field-group}}
+    {{f.ui-text-field name="roomId" label="Room id"}}
+    {{#f.submit}}Join Room{{/f.submit}}
+  {{/ui-field-group}}
+{{/ui-form}}
