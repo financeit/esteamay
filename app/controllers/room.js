@@ -1,16 +1,20 @@
 import Controller from '@ember/controller'
 import { action } from '@ember/object'
-import { inject as service } from '@ember/service'
 import { tracked } from '@glimmer/tracking'
+import { inject as service } from '@ember/service'
 
 
 export default class RoomController extends Controller {
+  @service firebase
+
   fibonacciSequence = [0,1,2,3,5,8,13,21,34,55,89]
 
   @tracked selectedNumber
 
   @action
-  selectCard(number) {
+  async selectCard(number) {
     this.selectedNumber = number
+
+    await this.firebase.vote(this.model.roomId, number)
   }
 }

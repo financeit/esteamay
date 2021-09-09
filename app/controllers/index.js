@@ -19,10 +19,15 @@ export default class IndexController extends Controller {
   }
 
   @action
-  joinRoom() {
+  async joinRoom() {
     let roomId = this.formData.roomId
 
-    this.router.transitionTo('room', roomId)
+    const joinResult = await this.firebase.joinRoom(roomId)
+
+    if(joinResult)
+      this.router.transitionTo('room', roomId)
+    else
+      this.router.transitionTo('not-found')
     // connect to an existing firebase room here
   }
 }

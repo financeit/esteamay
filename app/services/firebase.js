@@ -1,6 +1,6 @@
 import Service from '@ember/service'
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, addDoc, getDoc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAMhrnEu1SbhoHZ8on5SWI79En8eb6U-KU',
@@ -21,11 +21,13 @@ export default class FirebaseService extends Service {
 
   async createRoom(id) {
     try {
-      const docRef = await addDoc(collection(this.db, 'rooms'), {
-        id,
-        userType: 'owner'
-      })
-      console.log("Document written with ID: ", docRef.id);
+      await setDoc(doc(this.db, 'rooms', id), { id })
+      const collectionRef = collection(this.db, 'rooms', id, 'scores')
+      const scoreDoc = await addDoc(collectionRef, { })
+
+      this.scoreId = scoreDoc.id
+
+      console.log("Document written with ID: ", scoreDoc.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -33,9 +35,40 @@ export default class FirebaseService extends Service {
 
   async joinRoom(id) {
     try {
+      const roomRef = doc(this.db, 'rooms', id);
+      const docSnap = await getDoc(roomRef);
 
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        const collectionRef = collection(this.db, 'rooms', id, 'scores')
+        const scoreDoc = await addDoc(collectionRef, { })
+
+        this.scoreId = scoreDoc.id
+        return true
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
     } catch (e) {
       console.error("Error joining the room: ", e);
+    }
+    return false
+  }
+
+  async vote(id, score) {
+    try {
+      const roomRef = doc(this.db, 'rooms', id);
+      const room = await getDoc(roomRef);
+
+      // Check room availability
+      //if (room.exists()) {
+        const scoreRef = doc(this.db, 'rooms', id, 'scores', this.scoreId)
+        await setDoc(scoreRef, { score })
+      //} else {
+      //  console.log("No such room!");
+      //}
+    } catch (e) {
+      console.error("Error voting the room: ", e);
     }
   }
 }
