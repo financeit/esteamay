@@ -67,8 +67,6 @@
     "edition": "octane"
   },
   "dependencies": {
-    "ember-cli-typescript": "^4.2.1",
-    "ember-firebase-service": "^9.0.1",
-    "firebase": "^8.0.0"
+    "firebase": "^9.0.1"
   }
 }
