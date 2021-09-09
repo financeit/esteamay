@@ -1,3 +1,16 @@
 <UiHeading @level={{2}} @text="I'm the room page" />
 
-<UiText @text={{concat "You're in room: " @model.roomId}} />
+<div class="tw-mb-6">
+  <UiHeading @level={{6}} @text={{concat "You're in room: " @model.roomId}} />
+  <UiHeading @level={{6}} @text={{concat "You have selected card #: " this.selectedNumber}} />
+</div>
+
+<div class="tw-flex tw-justify-between tw-items-center">
+  {{#each this.fibonacciSequence as |number|}}
+    <button {{on "click" (fn this.selectCard number)}} class="tw-w-13 {{if (eq this.selectedNumber number) "tw-mb-8"}}">
+      {{#ui-card}}
+        {{number}}
+      {{/ui-card}}
+    </button>
+  {{/each}}
+</div>
