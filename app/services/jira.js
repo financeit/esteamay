@@ -3,8 +3,7 @@ import fetch from 'fetch'
 
 
 export default class JiraService extends Service {
-  @service store
-  
+
   fetchInfo(jiraId) {
     const url = this._apiUrl(jiraId)
 
@@ -21,6 +20,16 @@ export default class JiraService extends Service {
         })
 
         return ticket
+      }})
+  }
+  updateIssue(jiraId, points) {
+    const url = `${this._jiraBaseUrl()}/rest/api/latest/issue/${jiraId}`
+
+    fetch(url, {
+      method: 'PUT',
+      data: { "fields": {"customfield_10029": points } },
+      headers: {
+        'Authorization': 'Basic Z21pZ2dhbkBmaW5hbmNlaXQuaW86Zk1FWFBDSXJMSVZPVEtMS1pBRTVDQkY0'
       }})
   }
   _jiraBaseUrl() {
