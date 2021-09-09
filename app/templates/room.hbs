@@ -1,8 +1,7 @@
-<UiHeading @level={{2}} @text="I'm the room page" />
+<UiHeading @level={{2}} @text={{concat "Estimating Room: " @model.roomId}} />
 
 <div class="tw-mb-6">
-  <UiHeading @level={{6}} @text={{concat "You're in room: " @model.roomId}} />
-  <UiHeading @level={{6}} @text={{concat "You have selected card #: " this.selectedNumber}} />
+  <UiHeading @level={{6}} @text={{concat "Selected score card: " this.selectedNumber}} />
 </div>
 
 <div class="tw-flex tw-justify-between tw-items-center">
@@ -15,8 +14,13 @@
   {{/each}}
 </div>
 
-<div class="tw-mt-6">
-  <UiButton @kind="secondary" @text="Reset cards" @underlineOnHover={{false}} @onClick={{action "reset"}} />
-  <UiButton @kind="primary" @text="Reveal" @underlineOnHover={{false}} @onClick={{action "reveal"}} />
+<div class="tw-mt-12">
+  <div class="tw-my-6">
+    <UiButton @kind="primary" @text="Reveal Result" @underlineOnHover={{false}} @onClick={{action "reveal"}} />
+  </div>
+
+  <div class="tw-my-6">
+    <UiButton @kind="secondary" @text="Reset Room" @underlineOnHover={{false}} @onClick={{action "reset"}} />
+  </div>
 </div>
 

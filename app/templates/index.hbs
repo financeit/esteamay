@@ -1,10 +1,14 @@
-<UiHeading @level={{2}} @text="I'm the index page" />
 
-<UiButton @kind="secondary" @text="Create new room" @underlineOnHover={{false}} @onClick={{action "createNewRoom"}} />
+<div class="tw-flex tw-justify-between tw-items-center">
+  <UiHeading @level={{2}} @text="Let's estimate something!" />
+
+  <UiButton @kind="secondary" @text="Create New Room" @underlineOnHover={{false}} @onClick={{action "createNewRoom"}} />
+</div>
+
 
 {{#ui-form object=this.formData onSubmit=(action "joinRoom") as |f|}}
   {{#ui-field-group}}
-    {{f.ui-text-field name="roomId" label="Room id"}}
+    {{f.ui-text-field name="roomId" placeholder="Room ID" label="Join Existing Room" }}
     {{#f.submit}}Join Room{{/f.submit}}
   {{/ui-field-group}}
 {{/ui-form}}
