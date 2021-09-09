@@ -67,4 +67,26 @@ export default class FirebaseService extends Service {
       console.error("Error voting the room: ", e);
     }
   }
+
+  async reveal(id) {
+    try {
+      const roomRef = doc(this.db, 'rooms', id);
+      const docSnap = await getDoc(roomRef);
+
+      if (docSnap.exists()) {
+        const scoresRef = doc(this.db, 'rooms', id, 'scores')
+        const scoresSnap = await getDoc(scoresRef);
+
+        console.log(scoresSnap.data())
+
+        return true
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    } catch (e) {
+      console.error("Error joining the room: ", e);
+    }
+    return false
+  }
 }
