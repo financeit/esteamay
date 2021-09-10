@@ -1,6 +1,11 @@
 <UiHeading @level={{2}} @text={{concat "Estimating Room: " @model.roomId}} />
 
 <div class="tw-mb-6">
+  <strong>Jira ticket:</strong> <input type="text" placeholder="Jira ticket link" class="tw-p-1" />
+  <UiButton @kind="secondary" @text="Fetch" @underlineOnHover={{false}}/>
+</div>
+
+<div class="tw-mb-6">
   <UiHeading @level={{6}} @text={{concat "Selected score card: " this.selectedNumber}} />
 </div>
 
