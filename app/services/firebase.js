@@ -1,6 +1,7 @@
 import Service from '@ember/service'
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, addDoc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app'
+import { getFirestore, collection, doc, addDoc, getDoc, setDoc, getDocs } from 'firebase/firestore'
+import Cookies from 'js-cookie'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAMhrnEu1SbhoHZ8on5SWI79En8eb6U-KU',
@@ -11,98 +12,115 @@ const firebaseConfig = {
   appId: '1:1071522383728:web:32fa964c772b235c7031b5',
 }
 
+
 export default class FirebaseService extends Service {
-  app = initializeApp(firebaseConfig);
+  app = initializeApp(firebaseConfig)
   db = getFirestore(this.app)
 
   async setScoreDoc(roomId) {
+    if (!this.scoreId) {
+      let scoreId = Cookies.get('room-' + roomId)
+      if (scoreId) {
+        this.scoreId = scoreId
+        return this.scoreId
+      }
+    } else {
+      return this.scoreId
+    }
+    console.log('setScoreDoc in room ' + roomId)
     const collectionRef = collection(this.db, 'rooms', roomId, 'scores')
     const scoreDoc = await addDoc(collectionRef, {})
-
     this.scoreId = scoreDoc.id
-
-    return scoreDoc
+    console.log('new scoreId ' + this.scoreId)
+    return this.scoreId
   }
 
-  async reset(id) {
+  async reset(roomId) {
     // add code to delete all of the scores in the firebase room
   }
 
-  async createRoom(id) {
+  async createRoom(roomId) {
     try {
-      await setDoc(doc(this.db, 'rooms', id), { id })
-
-      let scoreDoc = this.setScoreDoc(id)
-
-      console.log("Document written with ID: ", scoreDoc.id);
+      await setDoc(doc(this.db, 'rooms', roomId), { roomId })
+      let scoreDocId = await this.setScoreDoc(roomId)
+      console.log('Room created with scoreID: ', scoreDocId)
+      return scoreDocId
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error('Error adding a room: ', e)
     }
   }
 
-  async joinRoom(id) {
+  async joinRoom(roomId) {
     try {
-      const roomRef = doc(this.db, 'rooms', id);
-      const docSnap = await getDoc(roomRef);
+      const roomRef = doc(this.db, 'rooms', roomId)
+      const docSnap = await getDoc(roomRef)
 
       if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
+        console.log('Rooms data: ', docSnap.data())
 
-        this.setScoreDoc(id)
+        await this.setScoreDoc(roomId)
         return true
       } else {
         // doc.data() will be undefined in this case
-        console.log("No such document!");
+        console.log('No such document!')
       }
     } catch (e) {
-      console.error("Error joining the room: ", e);
+      console.error('Error joining the room: ', e)
     }
     return false
   }
 
-  async vote(id, score) {
+  async vote(roomId, score) {
     try {
-      const roomRef = doc(this.db, 'rooms', id)
+      const roomRef = doc(this.db, 'rooms', roomId)
       const room = await getDoc(roomRef)
-      console.log('Voting in the room')
-      console.log(room)
 
       if (room.exists()) {
-        const scoreRef = doc(this.db, 'rooms', id, 'scores', this.scoreId)
-        console.log('Found score')
-        console.log(scoreRef)
-        console.log('Score ' + score)
-
+        const scoreRef = doc(this.db, 'rooms', roomId, 'scores', this.scoreId)
         await setDoc(scoreRef, { score })
       } else {
-       console.log("No such room!");
+       console.log('No such room!')
       }
     } catch (e) {
-      console.error("Error voting the room: ", e);
+      console.error('Error voting the room: ', e)
     }
   }
 
-  async reveal(id) {
+  async reveal(roomId) {
     try {
-      console.log(id)
-      const roomRef = doc(this.db, 'rooms', id)
-      const docSnap = await getDoc(roomRef)
+      const roomRef = doc(this.db, 'rooms', roomId)
+      const roomSnap = await getDoc(roomRef)
 
-      if (docSnap.exists()) {
-        const collectionRef = collection(this.db, 'rooms', id, 'scores')
+      if (roomSnap.exists()) {
+        const querySnapshot = await getDocs(collection(this.db, 'rooms', roomId, 'scores'))
+        let scoresSum = 0
+        let scoresCount = 0
+        let allScores = []
+        let d = {}
+        querySnapshot.forEach((doc) => {
+          d = doc.data()
+          if (d.score >= 0) {
+            allScores.push(d.score)
+            scoresSum += d.score
+            scoresCount++
+          }
+        })
 
-        console.log(collectionRef)
-        //const scoresSnap = await getDoc(scoresRef);
+        let result = 'Unknown'
+        if (scoresCount > 0) {
+          allScores = allScores.join(', ')
+          let average = Math.round(scoresSum / scoresCount)
+          result = 'Average: ' + average.toString()
+          result += '; Scores are: ' + allScores
+        }
 
-        //console.log(scoresSnap.data())
-
-        return true
+        return result
       } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!")
+        console.log('No such room!')
       }
     } catch (e) {
-      console.error("Error joining the room: ", e)
+      console.error('Error revealing the room: ')
+      console.error(e)
     }
     return false
   }

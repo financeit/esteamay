@@ -1,6 +1,7 @@
 import Controller from '@ember/controller'
 import { action } from '@ember/object'
 import { inject as service } from '@ember/service'
+import Cookies from 'js-cookie'
 
 export default class IndexController extends Controller {
   @service router
@@ -10,11 +11,12 @@ export default class IndexController extends Controller {
 
   @action
   async createNewRoom() {
-    let id = Math.random().toString(36).substr(2, 6) // alphanumeric id
+    let roomId = Math.random().toString(36).substr(2, 6) // alphanumeric id
 
-    await this.firebase.createRoom(id)
+    let scoreId = await this.firebase.createRoom(roomId)
+    Cookies.set('room-' + roomId, scoreId)
 
-    this.router.transitionTo('room', id)
+    this.router.transitionTo('room', roomId)
     // set up a new firebase room here
   }
 
@@ -24,7 +26,7 @@ export default class IndexController extends Controller {
 
     const joinResult = await this.firebase.joinRoom(roomId)
 
-    if(joinResult)
+    if (joinResult)
       this.router.transitionTo('room', roomId)
     else
       this.router.transitionTo('not-found')

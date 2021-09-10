@@ -9,6 +9,7 @@ export default class RoomController extends Controller {
   fibonacciSequence = [0,1,2,3,5,8,13,21,34,55,89]
 
   @tracked selectedNumber
+  @tracked average
 
   @action
   async selectCard(number) {
@@ -24,6 +25,7 @@ export default class RoomController extends Controller {
 
   @action
   async reveal() {
-    await this.firebase.reveal(this.model.roomId)
+    this.average = await this.firebase.reveal(this.model.roomId)
+    console.log('Result: ' + this.average)
   }
 }
