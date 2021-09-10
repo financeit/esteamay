@@ -95,19 +95,26 @@ export default class FirebaseService extends Service {
         const querySnapshot = await getDocs(collection(this.db, 'rooms', roomId, 'scores'))
         let scoresSum = 0
         let scoresCount = 0
+        let allScores = []
         let d = {}
         querySnapshot.forEach((doc) => {
           d = doc.data()
-          scoresSum += d.score
-          scoresCount++
+          if (d.score >= 0) {
+            allScores.push(d.score)
+            scoresSum += d.score
+            scoresCount++
+          }
         })
 
-        let average = 'Unknown'
+        let result = 'Unknown'
         if (scoresCount > 0) {
-          average = Math.round(scoresSum / scoresCount)
+          allScores = allScores.join(', ')
+          let average = Math.round(scoresSum / scoresCount)
+          result = 'Average: ' + average.toString()
+          result += '; Scores are: ' + allScores
         }
 
-        return average
+        return result
       } else {
         console.log('No such room!')
       }
