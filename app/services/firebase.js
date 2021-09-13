@@ -1,21 +1,18 @@
 import Service from '@ember/service'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, doc, addDoc, getDoc, setDoc, getDocs } from 'firebase/firestore'
+import { getFirestore, query, collection, deleteDoc, doc, addDoc, getDoc, setDoc, getDocs } from 'firebase/firestore'
 import Cookies from 'js-cookie'
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyAMhrnEu1SbhoHZ8on5SWI79En8eb6U-KU',
-  authDomain: 'esteamay-eca8d.firebaseapp.com',
-  projectId: 'esteamay-eca8d',
-  storageBucket: 'esteamay-eca8d.appspot.com',
-  messagingSenderId: '1071522383728',
-  appId: '1:1071522383728:web:32fa964c772b235c7031b5',
-}
-
+import { getOwner } from '@ember/application'
 
 export default class FirebaseService extends Service {
-  app = initializeApp(firebaseConfig)
-  db = getFirestore(this.app)
+  constructor() {
+    super(...arguments)
+
+    const envConfig = getOwner(this).resolveRegistration('config:environment')
+    const app = initializeApp(envConfig.firebaseConfig)
+
+    this.db = getFirestore(this.app)
+  }
 
   async setScoreDoc(roomId) {
     if (!this.scoreId) {
@@ -37,6 +34,16 @@ export default class FirebaseService extends Service {
 
   async reset(roomId) {
     // add code to delete all of the scores in the firebase room
+    const q = query(collection(this.db, 'rooms', roomId, 'scores'))
+    const scoreDocs = await getDocs(q);
+
+    scoreDocs.forEach(async scoreDoc => {
+      let scoreRef = doc(this.db, 'rooms', roomId, 'scores', scoreDoc.id)
+      await deleteDoc(scoreRef)
+
+      console.log('deleted ', scoreDoc.id, " => ", scoreDoc.data());
+    })
+    console.log('reset scores for room: ', roomId)
   }
 
   async createRoom(roomId) {
