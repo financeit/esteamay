@@ -6,7 +6,13 @@
 </div>
 
 <div class="tw-mb-6">
-  <UiHeading @level={{6}} @text={{this.selectedNumberText}} />
+  <UiHeading @level={{6}}>
+    {{#if this.selectedNumber}}
+      Selected score card: {{this.selectedNumber}}
+    {{else}}
+      Select your card, when prompted
+    {{/if}}
+  </UiHeading>
 </div>
 
 <div class="tw-flex tw-justify-between tw-items-center">
