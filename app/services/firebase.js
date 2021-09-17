@@ -164,7 +164,7 @@ export default class FirebaseService extends Service {
         if (scoresCount > 0) {
           allScores = allScores.join(', ')
           let average = Math.round(scoresSum / scoresCount)
-          result = 'Average: ' + average.toString()
+          result = average.toString()
           result += '; Scores are: ' + allScores
         }
 

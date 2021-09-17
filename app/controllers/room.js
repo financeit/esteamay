@@ -28,6 +28,7 @@ export default class RoomController extends Controller {
   resetSelectedNumber() {
     this.average = undefined
     this.selectedNumber = undefined
+    this.selectedNumberText = 'Select your card, when prompted'
   }
 
   @action
