@@ -53,24 +53,41 @@ export default class FirebaseService extends Service {
     const collectionRef = collection(this.db, 'rooms', roomId, 'scores')
     const scoreDoc = await addDoc(collectionRef, {})
     this.scoreId = scoreDoc.id
+    Cookies.set('room-' + roomId, this.scoreId)
     console.log('new scoreId ' + this.scoreId)
     return this.scoreId
   }
 
+  async updateResetTimestamp(roomId) {
+    return await setDoc(doc(this.db, 'rooms', roomId), { reset: new Date().getTime() })
+  }
+
+  async updateRevealTimestamp(roomId) {
+    return await setDoc(doc(this.db, 'rooms', roomId), { reveal: new Date().getTime() })
+  }
+
+  async getScore(roomId, scoreId) {
+    let scoreDoc = await getDoc(doc(this.db, 'rooms', roomId, 'scores', scoreId))
+    return scoreDoc.data()?.score
+  }
+
+  async setScore(roomId, scoreId, score) {
+    const scoreRef = doc(this.db, 'rooms', roomId, 'scores', scoreId)
+    return await setDoc(scoreRef, { score })
+  }
+
   async reset(roomId, dontUpdateReset) {
-    if (!dontUpdateReset) {
-      await setDoc(doc(this.db, 'rooms', roomId), { reset: new Date().getTime() })
-    }
+    if (!dontUpdateReset) this.updateResetTimestamp(roomId)
 
     // add code to delete all of the scores in the firebase room
     const q = query(collection(this.db, 'rooms', roomId, 'scores'))
-    const scoreDocs = await getDocs(q);
+    const scoreDocs = await getDocs(q)
 
     scoreDocs.forEach(async scoreDoc => {
       let scoreRef = doc(this.db, 'rooms', roomId, 'scores', scoreDoc.id)
       await deleteDoc(scoreRef)
 
-      console.log('deleted ', scoreDoc.id, " => ", scoreDoc.data());
+      console.log('deleted ', scoreDoc.id, ' => ', scoreDoc.data())
     })
     console.log('reset scores for room: ', roomId)
   }
@@ -112,8 +129,7 @@ export default class FirebaseService extends Service {
       const room = await getDoc(roomRef)
 
       if (room.exists()) {
-        const scoreRef = doc(this.db, 'rooms', roomId, 'scores', this.scoreId)
-        await setDoc(scoreRef, { score })
+        await this.setScore(roomId, this.scoreId, score)
       } else {
        console.log('No such room!')
       }
@@ -123,9 +139,7 @@ export default class FirebaseService extends Service {
   }
 
   async reveal(roomId, dontUpdateReveal) {
-    if (!dontUpdateReveal) {
-      await setDoc(doc(this.db, 'rooms', roomId), { reveal: new Date().getTime() })
-    }
+    if (!dontUpdateReveal) this.updateRevealTimestamp(roomId)
 
     try {
       const roomRef = doc(this.db, 'rooms', roomId)

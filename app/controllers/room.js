@@ -6,7 +6,7 @@ import { inject as service } from '@ember/service'
 export default class RoomController extends Controller {
   @service firebase
 
-  fibonacciSequence = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+  fibonacciSequence = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 
   @tracked selectedNumber
   @tracked average
