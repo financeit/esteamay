@@ -6,7 +6,7 @@ import { inject as service } from '@ember/service'
 export default class RoomController extends Controller {
   @service firebase
 
-  fibonacciSequence = [0,1,2,3,5,8,13,21,34,55,89]
+  fibonacciSequence = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 
   @tracked selectedNumber
   @tracked selectedNumberText = 'Select your card, when prompted'
@@ -27,9 +27,18 @@ export default class RoomController extends Controller {
     await this.firebase.reset(this.model.roomId)
   }
 
+  setAverage(number) {
+    this.average = number
+  }
+
+  resetSelectedNumber() {
+    this.average = undefined
+    this.selectedNumber = undefined
+  }
+
   @action
   async reveal() {
-    this.average = await this.firebase.reveal(this.model.roomId)
+    await this.firebase.reveal(this.model.roomId)
     console.log('Result: ' + this.average)
   }
 }

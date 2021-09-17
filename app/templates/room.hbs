@@ -19,10 +19,13 @@
   {{/each}}
 </div>
 
+{{#if this.average}}
+  <UiHeading @level={{6}} @text={{concat "Average selected is: " this.average}} />
+{{/if}}
+
 <div class="tw-mt-12">
   <div class="tw-my-6">
     <UiButton @kind="primary" @text="Reveal Result" @underlineOnHover={{false}} @onClick={{action "reveal"}} />
-
   </div>
 
   <div class="tw-my-6">

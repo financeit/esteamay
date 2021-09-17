@@ -1,6 +1,6 @@
 import Service from '@ember/service'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, query, collection, deleteDoc, doc, addDoc, getDoc, setDoc, getDocs } from 'firebase/firestore'
+import { getFirestore, onSnapshot, query, collection, deleteDoc, doc, addDoc, getDoc, setDoc, getDocs } from 'firebase/firestore'
 import Cookies from 'js-cookie'
 import { getOwner } from '@ember/application'
 
@@ -11,7 +11,32 @@ export default class FirebaseService extends Service {
     const envConfig = getOwner(this).resolveRegistration('config:environment')
     const app = initializeApp(envConfig.firebaseConfig)
 
-    this.db = getFirestore(this.app)
+    this.db = getFirestore(app)
+    this.listeners = []
+  }
+
+  async listenForReveal(roomId, callback) {
+    let currDate = new Date().getTime()
+    let listener = onSnapshot(doc(this.db, 'rooms', roomId), async (snapshot) => {
+      let reveal = snapshot.data().reveal
+      if (reveal > currDate) {
+        callback(await this.reveal(roomId, true))
+      }
+      console.log(snapshot)
+    })
+    this.listeners.push(listener)
+  }
+
+  async listenForReset(roomId, callback) {
+    let currDate = new Date().getTime()
+    let listener = onSnapshot(doc(this.db, 'rooms', roomId), async (snapshot) => {
+      let reset = snapshot.data().reset
+      if (reset > currDate) {
+        callback(await this.reset(roomId, true))
+      }
+      console.log(snapshot)
+    })
+    this.listeners.push(listener)
   }
 
   async setScoreDoc(roomId) {
@@ -32,7 +57,11 @@ export default class FirebaseService extends Service {
     return this.scoreId
   }
 
-  async reset(roomId) {
+  async reset(roomId, dontUpdateReset) {
+    if (!dontUpdateReset) {
+      await setDoc(doc(this.db, 'rooms', roomId), { reset: new Date().getTime() })
+    }
+
     // add code to delete all of the scores in the firebase room
     const q = query(collection(this.db, 'rooms', roomId, 'scores'))
     const scoreDocs = await getDocs(q);
@@ -93,7 +122,11 @@ export default class FirebaseService extends Service {
     }
   }
 
-  async reveal(roomId) {
+  async reveal(roomId, dontUpdateReveal) {
+    if (!dontUpdateReveal) {
+      await setDoc(doc(this.db, 'rooms', roomId), { reveal: new Date().getTime() })
+    }
+
     try {
       const roomRef = doc(this.db, 'rooms', roomId)
       const roomSnap = await getDoc(roomRef)
