@@ -4,15 +4,25 @@ import { inject as service } from '@ember/service'
 export default class RoomRoute extends Route {
   @service firebase
 
+  // eslint-disable-next-line camelcase
   model({ room_id }) {
     return {
       roomId: room_id
     }
   }
 
-  async afterModel(model) {
-    await this.firebase.setScoreDoc(model.roomId)
+  deactivate() {
+    this.firebase.listeners.forEach(listener => {
+      listener() // this unsubscribes the listener
+    })
+  }
 
-    // check here if room is valid, otherwise go to error page (potentially reuse joinRoom from firebase service)
+  async setupController(controller, model) {
+    super.setupController(controller, model)
+
+    await this.firebase.joinRoom(model.roomId)
+
+    this.firebase.listenForReveal(model.roomId, controller.setAverage.bind(controller))
+    this.firebase.listenForReset(model.roomId, controller.resetSelectedNumber.bind(controller))
   }
 }
