@@ -22,8 +22,6 @@ export default class RoomController extends Controller {
 
   @action
   async reset() {
-    this.selectedNumber = ''
-    this.selectedNumberText = 'Select your card, when prompted'
     await this.firebase.reset(this.model.roomId)
   }
 
@@ -34,6 +32,7 @@ export default class RoomController extends Controller {
   resetSelectedNumber() {
     this.average = undefined
     this.selectedNumber = undefined
+    this.selectedNumberText = 'Select your card, when prompted'
   }
 
   @action
