@@ -2,13 +2,18 @@
 
 <div class="tw-mb-6">
   <strong>Jira ticket:</strong> <input type="text" placeholder="Jira ticket link" class="tw-p-1" />
-  <UiButton @kind="secondary" @text="Fetch" @underlineOnHover={{false}}/>
+  <UiButton @kind="secondary" @text="Fetch" @underlineOnHover={{false}} @onClick={{action (toggle "showTicketDescription" this)}} />
 </div>
-<div class="tw-mb-6">
-  <strong>ES-16: Fix double score when refreshing the room page by a voter user</strong>
-  <br/>
-  Some description of the ticket goes here
-</div>
+
+{{#if this.showTicketDescription}}
+  <div class="tw-mb-6">
+    <strong>ES-16: Fix double score when refreshing the room page by a voter user</strong>
+    <br/>
+    This problem occurs when yadda yadda yadda
+
+    <UiLinkToExternal @href="https://esteamay.atlassian.net/browse/ES-16" @kind="basic" @text="https://esteamay.atlassian.net/browse/ES-16" />
+  </div>
+{{/if}}
 
 <div class="tw-mb-6">
   <UiHeading @level={{6}}>
